@@ -10,7 +10,7 @@ class tb3_navigation {
 
 public:
     tb3_navigation(const std::string &worldFrame, const std::string &frame,
-                  const ros::NodeHandle &n):m_bodyFrame(frame), m_worldFrame(worldFrame) {
+                  const ros::NodeHandle &n):m_bodyFrame(frame), m_worldFrame(worldFrame), elapsed_time(0) {
 
         m_pubNav = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
         m_listener.waitForTransform(m_worldFrame, m_bodyFrame, ros::Time(0), ros::Duration(10.0));
@@ -29,9 +29,10 @@ public:
         float x = transform.getOrigin().x();
         float y = transform.getOrigin().y();
         float w = transform.getOrigin().w();
-        ROS_INFO("Current position: %f %f", x, y);
+        elapsed_time += 1/frequency;
+        ROS_INFO("Current position x:%f y:%f w:%f time: %f", x, y, w, elapsed_time);
 
-        if(x < 1.5 && y < 1.5) {
+        if(elapsed_time < 10) {
             geometry_msgs::Twist msg;
             msg.linear.x = 0.15;
             m_pubNav.publish(msg);
@@ -45,6 +46,7 @@ private:
     float frequency;
     tf::TransformListener m_listener;
     ros::NodeHandle nh;
+    double elapsed_time;
 
 };
 
