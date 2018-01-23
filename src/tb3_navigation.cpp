@@ -10,7 +10,7 @@ class tb3_navigation {
 
 public:
     tb3_navigation(const std::string &worldFrame, const std::string &frame,
-                  const ros::NodeHandle &n):m_bodyFrame(frame), m_worldFrame(worldFrame), elapsed_time(0) {
+                   const ros::NodeHandle &n) : m_bodyFrame(frame), m_worldFrame(worldFrame), elapsed_time(0) {
 
         m_pubNav = nh.advertise<geometry_msgs::Twist>("cmd_vel", 1);
         m_listener.waitForTransform(m_worldFrame, m_bodyFrame, ros::Time(0), ros::Duration(10.0));
@@ -29,15 +29,15 @@ public:
         float x = transform.getOrigin().x();
         float y = transform.getOrigin().y();
         float w = transform.getOrigin().w();
-        elapsed_time += 1/frequency;
+        elapsed_time += 1 / frequency;
         ROS_INFO("Current position x:%f y:%f w:%f time: %f", x, y, w, elapsed_time);
         geometry_msgs::Twist msg;
+        msg.linear.x = 0;
 
-        if(elapsed_time < 10) {
+        if (elapsed_time < 10) {
             msg.linear.x = 0.15;
         }
-        
-        msg.linear.x = 0;
+
         m_pubNav.publish(msg);
 
     }
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     std::string worldFrame;
     n.param<std::string>("/turtle/worldFrame", worldFrame, "/world");
     std::string frame;
-    n.param<std::string>("/turtle/frame", frame,"vicon/raphael/raphael");
+    n.param<std::string>("/turtle/frame", frame, "vicon/raphael/raphael");
     double frequency;
     n.param("frequency", frequency, 50.0);
     tb3_navigation navigator(worldFrame, frame, n);
