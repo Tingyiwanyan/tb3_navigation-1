@@ -31,12 +31,15 @@ public:
         float w = transform.getOrigin().w();
         elapsed_time += 1/frequency;
         ROS_INFO("Current position x:%f y:%f w:%f time: %f", x, y, w, elapsed_time);
+        geometry_msgs::Twist msg;
 
         if(elapsed_time < 10) {
-            geometry_msgs::Twist msg;
             msg.linear.x = 0.15;
-            m_pubNav.publish(msg);
         }
+        
+        msg.linear.x = 0;
+        m_pubNav.publish(msg);
+
     }
 
 private:
