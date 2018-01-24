@@ -57,9 +57,9 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "turtlebot3_nav");
     static ros::NodeHandle n("~");
     std::string worldFrame;
-    n.param<std::string>("/turtle/worldFrame", worldFrame, "/world");
+    n.param<std::string>("worldFrame", worldFrame, "/world");
     std::string frame;
-    n.param<std::string>("/turtle/frame", frame, "vicon/raphael/raphael");
+    n.getParam("frame", frame);
     double frequency;
     n.param("frequency", frequency, 50.0);
     tb3_navigation navigator(worldFrame, frame, n);
