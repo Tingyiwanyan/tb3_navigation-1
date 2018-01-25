@@ -6,7 +6,11 @@
         <param name="frame" value="$(arg frame)"/>
         <param name="worldFrame" value="$(arg worldFrame)"/>
         <rosparam command="load" file="$(find tb3_navigation)/config/utils.yaml"/>
+
+        <remap from="tb3_navigation/cmd_vel" to="cmd_vel"/>
+
     </node>
+
 
     <!-- run vicon bridge -->
     <include file="$(find vicon_bridge)/launch/vicon.launch"/>
