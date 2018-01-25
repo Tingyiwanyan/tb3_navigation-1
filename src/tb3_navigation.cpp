@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
     geometry_msgs::Twist msg;
 
     float init_x;
+    float init_y;
     float x;
     float y;
 
@@ -42,8 +43,8 @@ int main(int argc, char **argv) {
     ros::Rate loop_rate(frequency);
     m_listener.lookupTransform(m_worldFrame, m_bodyFrame, ros::Time(0), transform);
     x = init_x = transform.getOrigin().x();
-
-    while(abs(x - init_x) < 1) {
+    y = init_y = transform.getOrigin().y();
+    while((abs(x - init_x) < 1) && (abs(y - init_y) < 1)) {
         // Get the transform between the worldframe and bodyframe by bodyframe ID and save it in transform variable.
         m_listener.lookupTransform(m_worldFrame, m_bodyFrame, ros::Time(0), transform);
 
