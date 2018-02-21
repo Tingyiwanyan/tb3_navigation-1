@@ -5,11 +5,17 @@
 #include "ros/ros.h"
 #include <tf/transform_listener.h>
 #include <std_srvs/Empty.h>
+#include <tf/transform_broadcaster.h>
 
 std::string m_worldFrame;
 std::string m_bodyFrame;
-static double frequency = 50;
-static int translation = 1;
+static double frequency = 20;
+static float linearV = 0.001;
+static float angularV = 0.001;
+static float dt = 0.001;
+
+void showOnRviz(float v, float theta_dot);
+float xPrev, yPrev, thetaPrev;
 
 int main(int argc, char **argv) {
 
@@ -23,12 +29,6 @@ int main(int argc, char **argv) {
  * message using m_pubNav publisher which publishes to cmd_vel topic.
  */
     geometry_msgs::Twist msg;
-
-    float init_x;
-    float init_y;
-    float x;
-    float y;
-
     n.param<std::string>("worldFrame", m_worldFrame, "world");
     n.getParam("frame", m_bodyFrame);
 
@@ -41,27 +41,49 @@ int main(int argc, char **argv) {
     ros::Publisher m_pubNav = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     m_listener.waitForTransform(m_worldFrame, m_bodyFrame, ros::Time(0), ros::Duration(10.0));
     ros::Rate loop_rate(frequency);
-    m_listener.lookupTransform(m_worldFrame, m_bodyFrame, ros::Time(0), transform);
-    x = init_x = transform.getOrigin().x();
-    y = init_y = transform.getOrigin().y();
-    while((abs(x - init_x) < 1) && (abs(y - init_y) < 1)) {
-        // Get the transform between the worldframe and bodyframe by bodyframe ID and save it in transform variable.
+
+    while(ros::ok()) {
+        /*
+         * reading the vicon feedback for error calculation. You can calculate your error and set the angular velocity
+         * accordingly. Here I have set a fixed angular and linear velocity for demonstration on Rviz.
+         */
         m_listener.lookupTransform(m_worldFrame, m_bodyFrame, ros::Time(0), transform);
-
-        // get the x, y value using the previously received transform.
-        x = transform.getOrigin().x();
-        y = transform.getOrigin().y();
-
-        ROS_INFO("Current position x:%f y:%f ", x, y);
-
-        msg.linear.x = 0.15;
+        float x = transform.getOrigin().x();
+        float y = transform.getOrigin().y();
+        /**
+         * PID calculations should come here
+         */
+        msg.linear.x = linearV;
+        msg.angular.z = angularV;
         m_pubNav.publish(msg);
+
+        /*
+         * set the rviz visualization
+         */
+        showOnRviz(linearV, angularV);
     }
 
-    msg.linear.x = 0;
-    m_pubNav.publish(msg);
 
+    ros::spin();
     return 0;
 }
 
+void showOnRviz(float v, float theta_dot) {
+    float x, y;
+    float theta = theta_dot*dt + thetaPrev;
+    x = (v*cos(theta))*dt + xPrev;
+    y = (v*sin(theta))*dt + yPrev;
+
+    static tf::TransformBroadcaster br;
+    tf::Transform transform_rviz;
+    tf::Quaternion q;
+    q.setRPY(0, 0, theta);
+    transform_rviz.setRotation(q);
+    transform_rviz.setOrigin(tf::Vector3(x, y, 0));
+    // Here I only set the baselink transformations. You can ignore the warnings on Rviz regarding other transformations.
+    br.sendTransform(tf::StampedTransform(transform_rviz, ros::Time::now(), "map", "base_link"));
+
+    xPrev = x; yPrev = y;
+    thetaPrev = theta;
+}
 
