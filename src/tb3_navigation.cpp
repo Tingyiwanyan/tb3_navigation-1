@@ -53,6 +53,8 @@ int main(int argc, char **argv) {
         float y = transform.getOrigin().y();
         /**
          * PID calculations should come here
+         * After the PID correction set the corrected angular velocity to the tf msg to be sent to the
+         * turtlebot. Then publish the values via cmd_vel topic.
          */
         msg.linear.x = linearV;
         msg.angular.z = angularV;
@@ -63,7 +65,8 @@ int main(int argc, char **argv) {
          */
         showOnRviz(linearV, angularV);
     }
-    
+
+
     ros::spin();
     return 0;
 }
@@ -80,7 +83,7 @@ void showOnRviz(float v, float theta_dot) {
     q.setRPY(0, 0, theta);
     transform_rviz.setRotation(q);
     transform_rviz.setOrigin(tf::Vector3(x, y, 0));
-    // Here I only set the baselink transformations. You can ignore the warnings on Rviz regarding other transformations.
+    // Here I only set the base_link transformations. You can ignore the warnings on Rviz regarding other transformations.
     br.sendTransform(tf::StampedTransform(transform_rviz, ros::Time::now(), "map", "base_link"));
 
     xPrev = x;
