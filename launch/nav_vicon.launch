@@ -2,7 +2,7 @@
     <arg name="frame" default="vicon/leonardo/leonardo"/>
     <arg name="worldFrame" default="world"/>
 
-    <arg name="model" value="$(find tb3_navigation)/tb3-rviz/waffle_naked.urdf"/>
+    <arg name="model" value="$(find tb3_navigation)/tb3-rviz/waffle.urdf"/>
     <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
     <arg name="rvizconfig" default="$(find tb3_navigation)/tb3-rviz/tb3-navigation.rviz" />
 

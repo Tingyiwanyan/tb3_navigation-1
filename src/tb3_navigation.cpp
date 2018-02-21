@@ -15,6 +15,7 @@ static float angularV = 0.001;
 static float dt = 0.001;
 
 void showOnRviz(float v, float theta_dot);
+
 float xPrev, yPrev, thetaPrev;
 
 int main(int argc, char **argv) {
@@ -42,7 +43,7 @@ int main(int argc, char **argv) {
     m_listener.waitForTransform(m_worldFrame, m_bodyFrame, ros::Time(0), ros::Duration(10.0));
     ros::Rate loop_rate(frequency);
 
-    while(ros::ok()) {
+    while (ros::ok()) {
         /*
          * reading the vicon feedback for error calculation. You can calculate your error and set the angular velocity
          * accordingly. Here I have set a fixed angular and linear velocity for demonstration on Rviz.
@@ -62,17 +63,16 @@ int main(int argc, char **argv) {
          */
         showOnRviz(linearV, angularV);
     }
-
-
+    
     ros::spin();
     return 0;
 }
 
 void showOnRviz(float v, float theta_dot) {
     float x, y;
-    float theta = theta_dot*dt + thetaPrev;
-    x = (v*cos(theta))*dt + xPrev;
-    y = (v*sin(theta))*dt + yPrev;
+    float theta = theta_dot * dt + thetaPrev;
+    x = (v * cos(theta)) * dt + xPrev;
+    y = (v * sin(theta)) * dt + yPrev;
 
     static tf::TransformBroadcaster br;
     tf::Transform transform_rviz;
@@ -83,7 +83,8 @@ void showOnRviz(float v, float theta_dot) {
     // Here I only set the baselink transformations. You can ignore the warnings on Rviz regarding other transformations.
     br.sendTransform(tf::StampedTransform(transform_rviz, ros::Time::now(), "map", "base_link"));
 
-    xPrev = x; yPrev = y;
+    xPrev = x;
+    yPrev = y;
     thetaPrev = theta;
 }
 
