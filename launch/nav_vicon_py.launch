@@ -6,13 +6,14 @@
     <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
     <arg name="rvizconfig" default="$(find tb3_navigation)/tb3-rviz/tb3-navigation.rviz" />
 
-    <node name="tb3_navigation" pkg="tb3_navigation" type="tb3_navigation" output="screen">
+    <node name="tb3_navigation" pkg="tb3_navigation" type="tb3_nav.py" output="screen">
         <param name="frame" value="$(arg frame)"/>
         <param name="worldFrame" value="$(arg worldFrame)"/>
         <rosparam command="load" file="$(find tb3_navigation)/config/utils.yaml"/>
-        <remap from="tb3_navigation/cmd_vel" to="cmd_vel"/>
+        <!--<remap from="tb3_navigation/cmd_vel" to="cmd_vel"/>-->
     </node>
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+    <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />-->
 
     <!-- run vicon bridge -->
     <include file="$(find vicon_bridge)/launch/vicon.launch"/>
